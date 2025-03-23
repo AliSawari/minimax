@@ -1,4 +1,4 @@
-# Telegram Video Compression Bot
+# Minimax
 
 A Telegram bot that compresses video files while maintaining good quality. The bot uses FFmpeg for video compression and supports multiple video formats.
 
