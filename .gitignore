@@ -1,0 +1,48 @@
+# Python virtual environment
+venv/
+env/
+.env
+.venv/
+ENV/
+bin/
+include/
+lib/
+lib64/
+Scripts/
+pyvenv.cfg
+share/
+
+# Python bytecode
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Distribution / packaging
+dist/
+build/
+*.egg-info/
+*.egg
+
+# IDE settings
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# Python coverage and testing
+.coverage
+htmlcov/
+.pytest_cache/
+.tox/
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# System files
+.DS_Store
+Thumbs.db
