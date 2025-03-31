@@ -234,8 +234,8 @@ async def compress_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
             return
         
         # # Clean up files
-        # input_file.unlink(missing_ok=True)
-        # output_file.unlink(missing_ok=True)
+        input_file.unlink(missing_ok=True)
+        output_file.unlink(missing_ok=True)
         
         await status_message.edit_text("✅ Video compression complete!")
         
