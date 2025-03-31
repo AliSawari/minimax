@@ -22,15 +22,19 @@ logger = logging.getLogger(__name__)
 # Replace with your bot token
 TOKEN = os.getenv("BOT_TOKEN")
 
+
+def env(key: str, default: str = None):
+    return os.getenv(key, default)
+
 # Custom request handler with increased timeout
 class CustomRequest(HTTPXRequest):
     def __init__(self):
         super().__init__(
-            connection_pool_size=int(os.getenv("CONN_POOL_SIZE", 8)),
-            read_timeout=float(os.getenv("READ_TIMEOUT", 20)),
-            write_timeout=float(os.getenv("WRITE_TIMEOUT", 20)),
-            connect_timeout=float(os.getenv("CONNECT_TIMEOUT", 20)),
-            pool_timeout=float(os.getenv("POOL_TIMEOUT", 20)),
+            connection_pool_size=int(env("CONN_POOL_SIZE", 8)),
+            read_timeout=float(env("READ_TIMEOUT", 20)),
+            write_timeout=float(env("WRITE_TIMEOUT", 20)),
+            connect_timeout=float(env("CONNECT_TIMEOUT", 20)),
+            pool_timeout=float(env("POOL_TIMEOUT", 20)),
         )
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -53,17 +57,18 @@ async def compress_video(input_path: str, output_path: str):
         # FFmpeg compression settings for better size reduction
         stream = ffmpeg.input(input_path)
         stream = ffmpeg.output(stream, output_path,
-            vcodec='libx264',        # Video codec
+            vcodec=env("FFMPEG_CODEC", "libx265"),        # Video codec
             acodec='aac',            # Audio codec
-            video_bitrate=str(os.getenv("FFMPEG_BITRATE", "1000k")),    # Reduced video bitrate
-            audio_bitrate=str(os.getenv("FFMPEG_AUDIO_BITRATE", "128k")),     # Reduced audio bitrate
-            preset='slower',         # Slower preset for better compression
-            crf=int(os.getenv("FFMPEG_CRF", 28)),                  # Increased CRF (23-28 range, higher = more compression)
+            video_bitrate=str(env("FFMPEG_BITRATE", "1000k")),    # Reduced video bitrate
+            audio_bitrate=str(env("FFMPEG_AUDIO_BITRATE", "128k")),     # Reduced audio bitrate
+            preset=env("FFMPEG_PRESET", "medium"),         # Slower preset for better compression
+            crf=int(env("FFMPEG_CRF", 28)),                  # Increased CRF (23-28 range, higher = more compression)
             movflags='+faststart',   # Enable fast start for web playback
             # Additional compression parameters
-            maxrate=str(os.getenv("FFMPEG_MAXRATE", "1500k")),         # Maximum bitrate cap
-            bufsize=str(os.getenv("FFMPEG_BUFSIZE", "2000k")),         # Buffer size
-            threads=int(os.getenv("FFMPEG_THREADS", 0))                # Use all available CPU threads
+            maxrate=str(env("FFMPEG_MAXRATE", "1500k")),         # Maximum bitrate cap
+            bufsize=str(env("FFMPEG_BUFSIZE", "2000k")),         # Buffer size
+            threads=int(env("FFMPEG_THREADS", 0)),               # Use all available CPU threads
+            vf=f"scale=-2:{env('FFMPEG_RESIZE', '720')}",       # Scale video height while maintaining aspect ratio
         )
         
         ffmpeg.run(stream, overwrite_output=True, capture_stdout=True, capture_stderr=True)
@@ -130,10 +135,10 @@ async def handle_video(update: Update, context: ContextTypes.DEFAULT_TYPE):
                             f"Original size: {original_size_mb:.2f} MB\n"
                             f"Compressed size: {compressed_size_mb:.2f} MB\n"
                             f"Reduced by: {compression_percent:.1f}%",
-                    read_timeout=30,
-                    write_timeout=30,
-                    connect_timeout=30,
-                    pool_timeout=30
+                    read_timeout=int(env("READ_TIMEOUT", 30)),
+                    write_timeout=int(env("WRITE_TIMEOUT", 30)),
+                    connect_timeout=int(env("CONNECT_TIMEOUT", 30)),
+                    pool_timeout=int(env("POOL_TIMEOUT", 30))
                 )
         except Exception as upload_error:
             logger.error(f"Upload error: {str(upload_error)}")
@@ -223,10 +228,10 @@ async def compress_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
                             f"Original size: {original_size_mb:.2f} MB\n"
                             f"Compressed size: {compressed_size_mb:.2f} MB\n"
                             f"Reduced by: {compression_percent:.1f}%",
-                    read_timeout=30,
-                    write_timeout=30,
-                    connect_timeout=30,
-                    pool_timeout=30
+                    read_timeout=int(env("READ_TIMEOUT", 30)),
+                    write_timeout=int(env("WRITE_TIMEOUT", 30)),
+                    connect_timeout=int(env("CONNECT_TIMEOUT", 30)),
+                    pool_timeout=int(env("POOL_TIMEOUT", 30))
                 )
         except Exception as upload_error:
             logger.error(f"Upload error: {str(upload_error)}")
